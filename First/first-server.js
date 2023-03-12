@@ -20,22 +20,24 @@ const server = http.createServer((request,response) =>{
             console.log(chunk);
             body.push(chunk)
         })
-        request.on('end',() =>{
+        return request.on('end',() =>{
             const parsedBody = Buffer.concat(body).toString();
             const message = parsedBody.split('=')[1];
             console.log(message);
-            fs.writeFileSync('message.txt', message);
+            fs.writeFile('message.txt', message, (err) =>{
+                response.statusCode = 302;
+                response.setHeader('Location','/');
+                return response.end();
+            });
         })
-        response.statusCode = 302;
-        response.setHeader('Location','/');
-        return response.end();
+
     }
-    // response.setHeader('Content-Type','text/html');
-    // response.write("<html>");
-    // response.write("<head><title>Hello from Node JS</title></head>");
-    // response.write("<body>Hello</body>")
-    // response.write("</html>");
-    // response.end();
+    response.setHeader('Content-Type','text/html');
+    response.write("<html>");
+    response.write("<head><title>Hello from Node JS</title></head>");
+    response.write("<body>Hello</body>")
+    response.write("</html>");
+    response.end();
 
 });
 server.listen(3000)
